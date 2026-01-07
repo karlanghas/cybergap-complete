@@ -1,7 +1,16 @@
+# =============================================================================
+# CyberGAP - Docker Compose para Portainer + GitHub
+# =============================================================================
+# Despliegue desde repositorio GitHub usando Portainer Stacks
+# Compatible con Raspberry Pi 5 (ARM64) y x86_64
+# =============================================================================
+
 version: '3.8'
 
 services:
-  # Backend API - FastAPI
+  # =========================================================================
+  # Backend API - FastAPI + SQLite
+  # =========================================================================
   backend:
     build:
       context: ./backend
@@ -10,26 +19,30 @@ services:
     restart: unless-stopped
     environment:
       - DATABASE_URL=sqlite:///./data/cybergap.db
-      - SECRET_KEY=${SECRET_KEY:-your-super-secret-key-change-in-production}
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-your-encryption-key-32-bytes-long!}
+      - SECRET_KEY=${SECRET_KEY:?Falta variable SECRET_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:?Falta variable ENCRYPTION_KEY}
       - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD:-admin123}
-      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost}
+      - CORS_ORIGIN=${BASE_URL:-http://localhost}
       - BASE_URL=${BASE_URL:-http://localhost}
       - DEBUG=${DEBUG:-false}
-      - TZ=America/Santiago
+      - TZ=${TZ:-America/Santiago}
     volumes:
       - cybergap_data:/app/data
       - cybergap_logs:/app/logs
     networks:
       - cybergap-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 20s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
-  # Frontend - Vue.js (built and served by nginx)
+  # =========================================================================
+  # Frontend - Vue.js 3 + Tailwind CSS
+  # =========================================================================
   frontend:
     build:
       context: ./frontend
@@ -41,39 +54,49 @@ services:
     networks:
       - cybergap-network
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
+  # =========================================================================
   # Nginx Reverse Proxy
+  # =========================================================================
   nginx:
     image: nginx:alpine
     container_name: cybergap-nginx
     restart: unless-stopped
     ports:
       - "${PORT:-80}:80"
-      - "${SSL_PORT:-443}:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - cybergap_ssl:/etc/nginx/ssl:ro
     networks:
       - cybergap-network
     depends_on:
       - backend
       - frontend
     healthcheck:
-      test: ["CMD", "nginx", "-t"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
+# =============================================================================
+# Volúmenes Persistentes
+# =============================================================================
 volumes:
   cybergap_data:
-    driver: local
+    name: cybergap_data
   cybergap_logs:
-    driver: local
-  cybergap_ssl:
-    driver: local
+    name: cybergap_logs
 
+# =============================================================================
+# Red Interna
+# =============================================================================
 networks:
   cybergap-network:
+    name: cybergap-network
     driver: bridge

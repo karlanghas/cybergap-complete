@@ -2,6 +2,31 @@
 
 Sistema completo para realizar análisis GAP de ciberseguridad con gestión multi-empresa, cuestionarios personalizados, detección de divergencias y reportes exportables.
 
+## 🚀 Despliegue Rápido con Portainer + GitHub
+
+> **Guía completa:** [DEPLOY_GITHUB_PORTAINER.md](./DEPLOY_GITHUB_PORTAINER.md)
+
+```bash
+# 1. Subir a GitHub
+git init && git add . && git commit -m "Initial commit"
+git remote add origin https://github.com/TU_USUARIO/cybergap.git
+git push -u origin main
+
+# 2. En Portainer (http://IP:9000)
+#    Stacks → Add stack → Repository
+#    URL: https://github.com/TU_USUARIO/cybergap
+#    Branch: main
+#    Compose path: docker-compose.yml
+
+# 3. Agregar variables de entorno:
+#    SECRET_KEY=<openssl rand -base64 32>
+#    ENCRYPTION_KEY=<openssl rand -base64 24 | head -c 32>
+#    DEFAULT_ADMIN_PASSWORD=TuPassword123!
+#    BASE_URL=http://IP_RASPBERRY
+
+# 4. Deploy → Acceder: http://IP_RASPBERRY
+```
+
 ## 📋 Características Principales
 
 ### Gestión Multi-Empresa y Organizacional
