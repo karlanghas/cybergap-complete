@@ -58,7 +58,7 @@ services:
     container_name: cybergap-nginx
     restart: unless-stopped
     ports:
-      - "${PORT:-80}:80"
+      - "${PORT:-8084}:80"
     networks:
       - cybergap-network
     depends_on:
