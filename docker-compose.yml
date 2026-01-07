@@ -24,19 +24,13 @@ services:
       - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD:-admin123}
       - CORS_ORIGIN=${BASE_URL:-http://localhost}
       - BASE_URL=${BASE_URL:-http://localhost}
-      - DEBUG=${DEBUG:-false}
+      - DEBUG=true
       - TZ=${TZ:-America/Santiago}
     volumes:
       - cybergap_data:/app/data
       - cybergap_logs:/app/logs
     networks:
       - cybergap-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
 
   # =========================================================================
   # Frontend - Vue.js 3 + Tailwind CSS
@@ -52,8 +46,7 @@ services:
     networks:
       - cybergap-network
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
 
   # =========================================================================
   # Nginx Reverse Proxy
