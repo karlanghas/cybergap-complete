@@ -196,10 +196,8 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useApi } from '../stores/api'
+import api from '@/stores/api'
 import AreaTreeItem from '../components/AreaTreeItem.vue'
-
-const api = useApi()
 
 const companies = ref([])
 const selectedCompany = ref(null)

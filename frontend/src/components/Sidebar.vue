@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import {

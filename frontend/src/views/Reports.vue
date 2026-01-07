@@ -269,10 +269,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useApi } from '../stores/api'
+import api from '@/stores/api'
 
 const route = useRoute()
-const api = useApi()
 
 const report = ref(null)
 const divergences = ref([])

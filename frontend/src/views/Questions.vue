@@ -424,9 +424,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useApi } from '../stores/api'
-
-const api = useApi()
+import api from '@/stores/api'
 
 const questions = ref([])
 const categories = ref([])

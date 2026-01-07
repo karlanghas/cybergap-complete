@@ -335,9 +335,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useApi } from '../stores/api'
-
-const api = useApi()
+import api from '@/stores/api'
 
 const users = ref([])
 const companies = ref([])

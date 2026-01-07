@@ -331,10 +331,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useApi } from '../stores/api'
+import api from '@/stores/api'
 
 const router = useRouter()
-const api = useApi()
 
 const questionnaires = ref([])
 const companies = ref([])

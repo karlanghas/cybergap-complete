@@ -1,44 +1,67 @@
+# =============================================================================
+# CyberGAP Frontend - Dockerfile
+# Compatible con ARM64 (Raspberry Pi 5) y AMD64
+# =============================================================================
+
 # Build stage
 FROM node:20-alpine AS builder
 
+# Aumentar memoria para Node en sistemas con poca RAM
+ENV NODE_OPTIONS="--max-old-space-size=1024"
+
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copiar package.json
+COPY package.json ./
 
-# Install dependencies
-RUN npm ci --silent
+# Instalar dependencias con más verbosidad
+RUN echo "📦 Instalando dependencias..." && \
+    npm install 2>&1 && \
+    echo "✅ Dependencias instaladas"
 
-# Copy source files
+# Copiar el resto de archivos
 COPY . .
 
 # Build argument for API URL
 ARG VITE_API_URL=/api
 ENV VITE_API_URL=$VITE_API_URL
 
-# Build the app
-RUN npm run build
+# Build con información de debug
+RUN echo "🔨 Construyendo aplicación..." && \
+    npm run build 2>&1 && \
+    echo "✅ Build completado" && \
+    ls -la dist/
 
 # Production stage
 FROM nginx:alpine
 
-# Copy built files
+# Copiar archivos construidos
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy nginx config for SPA
-RUN echo 'server { \
-    listen 80; \
-    server_name _; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    location / { \
-        try_files $uri $uri/ /index.html; \
-    } \
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ { \
-        expires 1y; \
-        add_header Cache-Control "public, immutable"; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+# Configuración nginx para SPA
+RUN cat > /etc/nginx/conf.d/default.conf << 'EOF'
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+    
+    # Gzip
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
+    
+    # SPA fallback
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    
+    # Cache static assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+EOF
 
 EXPOSE 80
 
