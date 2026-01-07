@@ -4,6 +4,7 @@ Utilidades de Seguridad - JWT, Hashing, Tokens
 import os
 import secrets
 import hashlib
+import base64
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
@@ -16,8 +17,25 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "480"))  # 8 horas
 
 # Encriptación para contraseñas SMTP
-ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY", Fernet.generate_key().decode())
+def get_fernet_key():
+    """Obtener clave Fernet válida desde variable de entorno o generar una"""
+    env_key = os.getenv("ENCRYPTION_KEY")
+    if env_key:
+        # Si la clave tiene 32 bytes, convertirla a formato Fernet (base64)
+        if len(env_key) == 32:
+            return base64.urlsafe_b64encode(env_key.encode()).decode()
+        # Si ya parece ser base64, usarla directamente
+        try:
+            # Verificar que es una clave Fernet válida
+            Fernet(env_key.encode() if isinstance(env_key, str) else env_key)
+            return env_key
+        except Exception:
+            # Si no es válida, generar una derivada
+            return base64.urlsafe_b64encode(hashlib.sha256(env_key.encode()).digest()).decode()
+    # Generar clave por defecto
+    return Fernet.generate_key().decode()
 
+ENCRYPTION_KEY = get_fernet_key()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 fernet = Fernet(ENCRYPTION_KEY.encode() if isinstance(ENCRYPTION_KEY, str) else ENCRYPTION_KEY)
 
@@ -71,3 +89,7 @@ def decrypt_password(encrypted_password: str) -> str:
 def hash_token(token: str) -> str:
     """Hash de token para búsqueda segura (no reversible)"""
     return hashlib.sha256(token.encode()).hexdigest()
+
+
+# Alias para compatibilidad
+hash_password = get_password_hash

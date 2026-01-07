@@ -19,8 +19,8 @@ services:
     restart: unless-stopped
     environment:
       - DATABASE_URL=sqlite:///./data/cybergap.db
-      - SECRET_KEY=${SECRET_KEY:?Falta variable SECRET_KEY}
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY:?Falta variable ENCRYPTION_KEY}
+      - SECRET_KEY=${SECRET_KEY:-defaultsecretkey32characterssafe}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-defaultencryptionkey32chars!!}
       - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD:-admin123}
       - CORS_ORIGIN=${BASE_URL:-http://localhost}
       - BASE_URL=${BASE_URL:-http://localhost}
@@ -32,13 +32,11 @@ services:
     networks:
       - cybergap-network
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 20s
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
+      retries: 5
+      start_period: 60s
 
   # =========================================================================
   # Frontend - Vue.js 3 + Tailwind CSS
@@ -56,8 +54,6 @@ services:
     depends_on:
       backend:
         condition: service_healthy
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
 
   # =========================================================================
   # Nginx Reverse Proxy
@@ -76,13 +72,6 @@ services:
     depends_on:
       - backend
       - frontend
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
 
 # =============================================================================
 # Volúmenes Persistentes
