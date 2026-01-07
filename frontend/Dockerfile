@@ -1,3 +1,8 @@
+# =============================================================================
+# CyberGAP Frontend - Dockerfile
+# Compatible con ARM64 (Raspberry Pi 5) y AMD64
+# =============================================================================
+
 # Build stage
 FROM node:20-alpine AS builder
 
@@ -6,8 +11,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --silent
+# Install dependencies (use npm install, not npm ci, for flexibility)
+RUN npm install --legacy-peer-deps
 
 # Copy source files
 COPY . .
