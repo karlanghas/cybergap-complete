@@ -42,7 +42,7 @@ RUN chmod +x ./start.sh
 RUN mkdir -p /app/data /app/logs && chmod 777 /app/data /app/logs
 
 # Puerto
-EXPOSE 8000
+EXPOSE 8085
 
 # Comando por defecto con script de inicio
 CMD ["./start.sh"]

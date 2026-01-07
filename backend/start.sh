@@ -52,5 +52,5 @@ except Exception as e:
 "
 
 echo ""
-echo "✅ Verificación completa. Iniciando servidor..."
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+echo "✅ Verificación completa. Iniciando servidor en puerto 8085..."
+exec uvicorn app.main:app --host 0.0.0.0 --port 8085
