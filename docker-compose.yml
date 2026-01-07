@@ -2,7 +2,7 @@
 # CyberGAP - Docker Compose para Portainer + GitHub
 # =============================================================================
 # Despliegue desde repositorio GitHub usando Portainer Stacks
-# Compatible con Raspberry Pi 5 (ARM64) y x86_64
+# Compatible con Raspberry Pi 5 (ARM64) y x86_64 V2
 # =============================================================================
 
 version: '3.8'
