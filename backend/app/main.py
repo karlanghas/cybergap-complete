@@ -45,11 +45,11 @@ async def create_default_admin():
     
     db = SessionLocal()
     try:
-        admin = db.query(AdminUser).filter(AdminUser.email == "admin@cybergap.local").first()
+        admin = db.query(AdminUser).filter(AdminUser.email == "admin@cybergap.com").first()
         if not admin:
             default_password = os.getenv("DEFAULT_ADMIN_PASSWORD", "admin123")
             admin = AdminUser(
-                email="admin@cybergap.local",
+                email="admin@cybergap.com",
                 full_name="Administrador",
                 hashed_password=hash_password(default_password),
                 is_superadmin=True,
@@ -57,7 +57,7 @@ async def create_default_admin():
             )
             db.add(admin)
             db.commit()
-            print(f"👤 Admin creado: admin@cybergap.local / {default_password}")
+            print(f"👤 Admin creado: admin@cybergap.com / {default_password}")
     finally:
         db.close()
 
