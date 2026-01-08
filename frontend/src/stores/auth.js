@@ -11,9 +11,9 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!token.value)
   
   // Actions
-  async function login(username, password) {
+  async function login(email, password) {
     try {
-      const response = await api.post('/auth/login', { username, password })
+      const response = await api.post('/auth/login', { email, password })
       token.value = response.data.access_token
       localStorage.setItem('token', token.value)
       api.defaults.headers.common['Authorization'] = `Bearer ${token.value}`

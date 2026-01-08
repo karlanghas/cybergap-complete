@@ -58,19 +58,19 @@ const handleLogin = async () => {
             {{ error }}
           </div>
           
-          <!-- Username -->
+          <!-- Email -->
           <div>
             <label for="username" class="block text-sm font-medium text-gray-300 mb-2">
-              Usuario
+              Email
             </label>
             <input
               id="username"
               v-model="username"
-              type="text"
-              autocomplete="username"
+              type="email"
+              autocomplete="email"
               required
               class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-              placeholder="admin"
+              placeholder="admin@cybergap.local"
             />
           </div>
           
