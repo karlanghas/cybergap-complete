@@ -1,6 +1,7 @@
 # =============================================================================
 # CyberGAP Frontend - Dockerfile
 # Compatible con ARM64 (Raspberry Pi 5) y AMD64
+# REBUILD: 2025-01-08-v13
 # =============================================================================
 
 # Build stage
@@ -10,6 +11,9 @@ FROM node:20-alpine AS builder
 ENV NODE_OPTIONS="--max-old-space-size=1024"
 
 WORKDIR /app
+
+# Cache bust para forzar rebuild
+RUN echo "Build timestamp: $(date)"
 
 # Copiar package.json
 COPY package.json ./

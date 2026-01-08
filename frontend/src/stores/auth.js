@@ -13,13 +13,18 @@ export const useAuthStore = defineStore('auth', () => {
   // Actions
   async function login(email, password) {
     try {
-      const response = await api.post('/auth/login', { email, password })
+      console.log('🔐 Login attempt:', { email, password: '***' })
+      const payload = { email, password }
+      console.log('📤 Sending payload:', JSON.stringify(payload))
+      const response = await api.post('/auth/login', payload)
+      console.log('✅ Login success')
       token.value = response.data.access_token
       localStorage.setItem('token', token.value)
       api.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
       await fetchUser()
       return { success: true }
     } catch (error) {
+      console.error('❌ Login error:', error.response?.data)
       return { 
         success: false, 
         error: error.response?.data?.detail || 'Error de autenticación' 
