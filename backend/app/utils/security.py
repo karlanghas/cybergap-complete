@@ -40,14 +40,18 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 fernet = Fernet(ENCRYPTION_KEY.encode() if isinstance(ENCRYPTION_KEY, str) else ENCRYPTION_KEY)
 
 
+def get_password_hash(password: str) -> str:
+    """Generar hash de contraseña (trunca a 72 bytes para bcrypt)"""
+    # bcrypt tiene límite de 72 bytes
+    password = password[:72] if len(password.encode('utf-8')) > 72 else password
+    return pwd_context.hash(password)
+
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verificar contraseña contra hash"""
+    # Truncar igual que al hashear
+    plain_password = plain_password[:72] if len(plain_password.encode('utf-8')) > 72 else plain_password
     return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password: str) -> str:
-    """Generar hash de contraseña"""
-    return pwd_context.hash(password)
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
